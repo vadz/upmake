@@ -72,7 +72,7 @@ sub update_msbuild
                         # Convert path separator to the one used by MSBuild.
                         $file =~ s@/@\\@g;
 
-                        print $out qq{    <Cl$kind Include="$file" />\n};
+                        print $out qq{    <Cl$kind Include="$file" />\r\n};
 
                         $changed = 1;
                     }
@@ -186,9 +186,9 @@ sub update_msbuild_filters
 
                         print $out qq{$indent$indent<Cl$kind Include="$file"};
                         if (defined $filter) {
-                            print $out ">\n$indent$indent$indent<Filter>$filter</Filter>\n$indent$indent</Cl$kind>\n";
+                            print $out ">\r\n$indent$indent$indent<Filter>$filter</Filter>\r\n$indent$indent</Cl$kind>\r\n";
                         } else {
-                            print $out " />\n";
+                            print $out " />\r\n";
                         }
 
                         $changed = 1;
