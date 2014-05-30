@@ -8,6 +8,8 @@ use Exporter qw(import);
 
 our @EXPORT = qw(read_files_list upmake);
 
+# VERSION
+
 =head1 NAME
 
 Text::Upmake - Update make files.
