@@ -2,7 +2,7 @@ package Text::Upmake::MSBuild;
 # ABSTRACT: Update list of sources and headers in MSBuild projects.
 
 use Exporter qw(import);
-our @EXPORT = qw(update_msbuild update_msbuild_filters);
+our @EXPORT = qw(update_msbuild_project update_msbuild update_msbuild_filters);
 
 # VERSION
 
@@ -12,15 +12,58 @@ Given an MSBuild project C<project.vcxproj> and its associated filters file
 C<projects.vcxproj.filters>, the functions in this module can be used to update
 the list of files in them to correspond to the given ones.
 
-    use Text::Upmake::Bakefile0;
-    Text::Upmake::upmake('project.vcxproj', \&update_msbuild, \@sources, \@headers);
-    Text::Upmake::upmake('project.vcxproj.filters', \&update_msbuild_filters, \@sources, \@headers);
+    use Text::Upmake::MSBuild;
+    upmake_msbuild_project('project.vcxproj', \@sources, \@headers);
 
 =head1 SEE ALSO
 
 Text::Upmake
 
 =cut
+
+=func update_msbuild_project
+
+Update sources and headers in an MSBuild project and filter files.
+
+Pass the path to the path of the project to update as parameter and the
+references to the sources and headers arrays. If sources and headers are not
+specified, read the C<files> file in the directory of the project file and
+uses "sources" and "headers" variables defined in it.
+
+Returns 1 if any changes were made.
+=cut
+
+sub update_msbuild_project
+{
+    my ($project_fname, $sources, $headers) = @_;
+
+    use Text::Upmake;
+
+    if (!defined($sources) && !defined($headers)) {
+        require File::Spec;
+
+        my ($volume, $dirs) = File::Spec->splitpath($project_fname);
+        my $files_fname = File::Spec->catpath($volume, $dirs, 'files');
+
+        open my $files, '<', $files_fname or
+            die qq{Can't read the files list from "$files_fname".\n};
+
+        my $vars = Text::Upmake::read_files_list($files);
+        $sources = $vars->{sources};
+        $headers = $vars->{headers};
+    }
+
+    if (!Text::Upmake::upmake($project_fname,
+                \&update_msbuild, $sources, $headers
+            )) {
+        return 0;
+    }
+
+    return Text::Upmake::upmake("$project_fname.filters",
+                \&update_msbuild_filters, $sources, $headers
+            );
+}
+
 
 =func update_msbuild
 
@@ -78,6 +121,7 @@ sub update_msbuild
                 }
 
                 $in_sources = $in_headers = 0;
+                $files = undef;
             }
 
             $in_group = 0;
