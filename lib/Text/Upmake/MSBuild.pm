@@ -4,6 +4,8 @@ package Text::Upmake::MSBuild;
 use Exporter qw(import);
 our @EXPORT = qw(update_msbuild update_msbuild_filters);
 
+# VERSION
+
 =head1 SYNOPSIS
 
 Given an MSBuild project C<project.vcxproj> and its associated filters file

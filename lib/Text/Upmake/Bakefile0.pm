@@ -4,6 +4,8 @@ package Text::Upmake::Bakefile0;
 use Exporter qw(import);
 our @EXPORT = qw(update_bakefile_0);
 
+# VERSION
+
 =head1 SYNOPSIS
 
 This is used exclusively to update wxWidgets C<files.bkl> and is probably not
