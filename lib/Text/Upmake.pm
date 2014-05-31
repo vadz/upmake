@@ -1,5 +1,7 @@
 package Text::Upmake;
 
+# ABSTRACT: Update make files.
+
 use strict;
 use warnings;
 use autodie;
@@ -10,15 +12,11 @@ our @EXPORT = qw(read_files_list upmake);
 
 # VERSION
 
-=head1 NAME
-
-Text::Upmake - Update make files.
-
 =head1 SYNOPSIS
 
-=head1 AUTHOR
-
-Vadim Zeitlin
+    use Text::Upmake;
+    my $vars = read_files_list('files.lst');
+    upmake('foo.vcxproj', $vars->{sources}, $vars->{headers});
 
 =cut
 

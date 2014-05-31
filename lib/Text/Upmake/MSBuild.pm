@@ -1,11 +1,8 @@
 package Text::Upmake::MSBuild;
+# ABSTRACT: Update list of sources and headers in MSBuild projects.
 
 use Exporter qw(import);
 our @EXPORT = qw(update_msbuild update_msbuild_filters);
-
-=head1 NAME
-
-Text::Upmake::MSBuild - Update list of sources and headers in MSBuild projects.
 
 =head1 SYNOPSIS
 
@@ -14,16 +11,12 @@ C<projects.vcxproj.filters>, the functions in this module can be used to update
 the list of files in them to correspond to the given ones.
 
     use Text::Upmake::Bakefile0;
-    Text::Upmake::upmake('projects.vcxproj', \&update_msbuild, \@sources, \@headers);
-    Text::Upmake::upmake('projects.vcxproj.filters', \&update_msbuild_filters, \@sources, \@headers);
+    Text::Upmake::upmake('project.vcxproj', \&update_msbuild, \@sources, \@headers);
+    Text::Upmake::upmake('project.vcxproj.filters', \&update_msbuild_filters, \@sources, \@headers);
 
 =head1 SEE ALSO
 
 Text::Upmake
-
-=head1 AUTHOR
-
-Vadim Zeitlin
 
 =cut
 

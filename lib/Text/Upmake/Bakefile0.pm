@@ -1,11 +1,8 @@
 package Text::Upmake::Bakefile0;
+# ABSTRACT: Update bakefile-0.x files list.
 
 use Exporter qw(import);
 our @EXPORT = qw(update_bakefile_0);
-
-=head1 NAME
-
-Text::Upmake::Bakefile0 - Update bakefile-0.x files list.
 
 =head1 SYNOPSIS
 
@@ -18,10 +15,6 @@ useful outside of wxWidgets project.
 =head1 SEE ALSO
 
 Text::Upmake
-
-=head1 AUTHOR
-
-Vadim Zeitlin
 
 =cut
 
