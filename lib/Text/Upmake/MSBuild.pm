@@ -22,12 +22,16 @@ Text::Upmake
 
 =cut
 
-# Update sources and headers in an MSBuild project.
-#
-# Parameters: input and output file handles and array references to the sources
-# and the headers to be used in this project.
-#
-# Returns 1 if any changes were made.
+=func update_msbuild
+
+Update sources and headers in an MSBuild project.
+
+Parameters: input and output file handles and array references to the sources
+and the headers to be used in this project.
+
+Returns 1 if any changes were made.
+=cut
+
 sub update_msbuild
 {
     my ($in, $out, $sources, $headers) = @_;
@@ -127,13 +131,17 @@ sub update_msbuild
     $changed
 }
 
-# Update sources and headers in an MSBuild filters file.
-#
-# Parameters: input and output file handles, array references to the sources
-# and the headers to be used in this project and a callback used to determine
-# the filter for the new files.
-#
-# Returns 1 if any changes were made.
+=func update_msbuild_filters
+
+Update sources and headers in an MSBuild filters file.
+
+Parameters: input and output file handles, array references to the sources
+and the headers to be used in this project and a callback used to determine
+the filter for the new files.
+
+Returns 1 if any changes were made.
+=cut
+
 sub update_msbuild_filters
 {
     my ($in, $out, $sources, $headers, $filter_cb) = @_;

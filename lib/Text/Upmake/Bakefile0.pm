@@ -20,16 +20,17 @@ Text::Upmake
 
 =cut
 
-# Update file with variable definitions in bakefile-0 format with the data
-# from the hash ref containing all the file lists.
-#
-# Takes the (open) file handles of the files to read and to write and the file
-# lists hash ref as arguments.
-#
-# Returns 1 if any changes were made.
-#
-# The caller must take care of actually renaming the second file to the first
-# one.
+=func update_bakefile_0
+
+Update file with variable definitions in bakefile-0 format with the data
+from the hash ref containing all the file lists.
+
+Takes the (open) file handles of the files to read and to write and the file
+lists hash ref as arguments.
+
+Returns 1 if any changes were made.
+=cut
+
 sub update_bakefile_0
 {
     my ($in, $out, $vars) = @_;

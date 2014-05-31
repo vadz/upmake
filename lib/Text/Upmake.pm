@@ -20,10 +20,25 @@ our @EXPORT = qw(read_files_list upmake);
 
 =cut
 
-# Reads the file containing the file lists definitions and returns a hash ref
-# with variable names as keys and refs to arrays of the file names as values.
-#
-# Takes an (open) file handle as argument.
+=func read_files_list
+
+Reads the file containing the file lists definitions and returns a hash ref
+with variable names as keys and refs to arrays of the file names as values.
+
+Takes an (open) file handle as argument.
+
+The file contents is supposed to have the following very simple format:
+
+    # Comments are allowed and ignored.
+    sources =
+        file1.cpp
+        file2.cpp
+
+    headers =
+        file1.h
+        file2.h
+=cut
+
 sub read_files_list
 {
     my ($fh) = @_;
@@ -48,10 +63,15 @@ sub read_files_list
     return \%vars;
 }
 
-# Update the file with the given name in place using the specified function and
-# passing it the rest of the arguments.
-#
-# This is meant to be used with update_xxx() below.
+=func upmake
+
+Update the file with the given name in place using the specified function and
+passing it the rest of the arguments.
+
+This is meant to be used with C<update_xxx()> defined in different
+Text::Upmake::Xxx modules.
+=cut
+
 sub upmake
 {
     my ($fname, $updater, @args) = @_;
