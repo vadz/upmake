@@ -146,6 +146,21 @@ sub update_msbuild_filters
 {
     my ($in, $out, $sources, $headers, $filter_cb) = @_;
 
+    # Use standard/default classifier for the files if none is explicitly
+    # specified.
+    if (!defined $filter_cb) {
+        $filter_cb = sub {
+            my ($file) = @_;
+
+            return 'Source Files' if $file =~ q{\.c(c|pp|xx|\+\+)?$};
+            return 'Header Files' if $file =~ q{\.h(h|pp|xx|\+\+)?$};
+
+            warn qq{No filter defined for the file "$file".\n};
+
+            undef
+        }
+    }
+
     # Hashes mapping the sources/headers names to the text representing them in
     # the input file if they have been seen in it or nothing otherwise.
     my %sources = map { $_ => undef } @$sources;
@@ -180,7 +195,7 @@ sub update_msbuild_filters
                     if (defined $files->{$file}) {
                         print $out $files->{$file};
                     } else {
-                        my $filter = defined $filter_cb ? $filter_cb->($file) : undef;
+                        my $filter = $filter_cb->($file);
 
                         # Convert path separator to the one used by MSBuild.
                         $file =~ s@/@\\@g;
