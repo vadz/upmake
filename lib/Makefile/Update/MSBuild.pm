@@ -1,4 +1,4 @@
-package Text::Upmake::MSBuild;
+package Makefile::Update::MSBuild;
 # ABSTRACT: Update list of sources and headers in MSBuild projects.
 
 use Exporter qw(import);
@@ -12,12 +12,12 @@ Given an MSBuild project C<project.vcxproj> and its associated filters file
 C<projects.vcxproj.filters>, the functions in this module can be used to update
 the list of files in them to correspond to the given ones.
 
-    use Text::Upmake::MSBuild;
+    use Makefile::Update::MSBuild;
     upmake_msbuild_project('project.vcxproj', \@sources, \@headers);
 
 =head1 SEE ALSO
 
-Text::Upmake
+Makefile::Update
 
 =cut
 
@@ -37,7 +37,7 @@ sub update_msbuild_project
 {
     my ($project_fname, $sources, $headers) = @_;
 
-    use Text::Upmake;
+    use Makefile::Update;
 
     if (!defined($sources) && !defined($headers)) {
         require File::Spec;
@@ -48,18 +48,18 @@ sub update_msbuild_project
         open my $files, '<', $files_fname or
             die qq{Can't read the files list from "$files_fname".\n};
 
-        my $vars = Text::Upmake::read_files_list($files);
+        my $vars = Makefile::Update::read_files_list($files);
         $sources = $vars->{sources};
         $headers = $vars->{headers};
     }
 
-    if (!Text::Upmake::upmake($project_fname,
+    if (!Makefile::Update::upmake($project_fname,
                 \&update_msbuild, $sources, $headers
             )) {
         return 0;
     }
 
-    return Text::Upmake::upmake("$project_fname.filters",
+    return Makefile::Update::upmake("$project_fname.filters",
                 \&update_msbuild_filters, $sources, $headers
             );
 }

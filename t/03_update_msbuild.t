@@ -3,8 +3,8 @@ use warnings;
 use autodie;
 use Test::More;
 
-use Text::Upmake;
-BEGIN { use_ok('Text::Upmake::MSBuild'); }
+use Makefile::Update;
+BEGIN { use_ok('Makefile::Update::MSBuild'); }
 
 my $sources = [qw(file1.cpp file2.cpp fileNew.cpp)];
 my $headers = [qw(file1.h file2.h fileNew.h)];

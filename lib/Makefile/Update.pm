@@ -1,4 +1,4 @@
-package Text::Upmake;
+package Makefile::Update;
 
 # ABSTRACT: Update make files.
 
@@ -14,7 +14,7 @@ our @EXPORT = qw(read_files_list upmake);
 
 =head1 SYNOPSIS
 
-    use Text::Upmake;
+    use Makefile::Update;
     my $vars = read_files_list('files.lst');
     upmake('foo.vcxproj', $vars->{sources}, $vars->{headers});
 
@@ -69,7 +69,7 @@ Update the file with the given name in place using the specified function and
 passing it the rest of the arguments.
 
 This is meant to be used with C<update_xxx()> defined in different
-Text::Upmake::Xxx modules.
+Makefile::Update::Xxx modules.
 =cut
 
 sub upmake

@@ -1,4 +1,4 @@
-package Text::Upmake::Bakefile0;
+package Makefile::Update::Bakefile0;
 # ABSTRACT: Update bakefile-0.x files list.
 
 use Exporter qw(import);
@@ -11,12 +11,12 @@ our @EXPORT = qw(update_bakefile_0);
 This is used exclusively to update wxWidgets C<files.bkl> and is probably not
 useful outside of wxWidgets project.
 
-    use Text::Upmake::Bakefile0;
-    Text::Upmake::upmake('bakefiles/files.bkl', \&update_bakefile_0, $vars);
+    use Makefile::Update::Bakefile0;
+    Makefile::Update::upmake('bakefiles/files.bkl', \&update_bakefile_0, $vars);
 
 =head1 SEE ALSO
 
-Text::Upmake
+Makefile::Update
 
 =cut
 

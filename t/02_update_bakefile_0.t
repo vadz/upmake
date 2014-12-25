@@ -3,7 +3,7 @@ use warnings;
 use autodie;
 use Test::More;
 
-BEGIN { use_ok('Text::Upmake::Bakefile0'); }
+BEGIN { use_ok('Makefile::Update::Bakefile0'); }
 
 my $vars = {
         VAR1 => [qw(file1 file2 fileNew)],

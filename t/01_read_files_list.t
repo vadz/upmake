@@ -3,7 +3,7 @@ use warnings;
 use autodie;
 use Test::More;
 
-BEGIN { use_ok('Text::Upmake'); }
+BEGIN { use_ok('Makefile::Update'); }
 
 my $vars = read_files_list(*DATA);
 is_deeply($vars->{VAR1}, [qw(file1 file2)], 'VAR1 has expected value');
