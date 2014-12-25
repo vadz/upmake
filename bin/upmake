@@ -1,0 +1,58 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use autodie;
+
+use Getopt::Long;
+
+use Makefile::Update;
+use Makefile::Update::Bakefile0;
+use Makefile::Update::MSBuild;
+
+my $verbose = 0;
+my $quiet = 0;
+
+GetOptions(
+        'verbose|v'      => \$verbose,
+        'quiet|q'        => \$quiet,
+    ) and (@ARGV > 0) or die <<EOF
+Usage: $0 [--verbose] [--quiet] [--dry-run|-n] <file-to-update...>
+
+Update the sources and headers files used in the specified make/project
+file(s) from the list of files in "files" file in the current directory.
+EOF
+;
+
+# Helper calling upmake() to actually update the file and showing the result.
+sub log_upmake
+{
+    my ($fname, @args) = @_;
+
+    if (upmake($fname, @args)) {
+        print qq{File "$fname" successfully updated.\n} unless $quiet;
+        return 1;
+    } else {
+        print qq{No changes in the file "$fname".\n} if $verbose;
+        return 0;
+    }
+}
+
+open my $files, '<', 'files';
+my $vars = read_files_list($files);
+
+foreach my $fname (@ARGV) {
+    # What kind of file is it?
+    if ($fname =~ /\.bkl$/) {
+        if (log_upmake($fname, \&update_bakefile_0, $vars)) {
+            print qq{Don't forget to run bakefile or bakefile_gen now.} if $verbose;
+        }
+    } elsif ($fname =~ /\.vcxproj$/) {
+        my $sources = $vars->{sources};
+        my $headers = $vars->{headers};
+        log_upmake($fname, \&update_msbuild, $sources, $headers);
+        log_upmake("$fname.filters", \&update_msbuild_filters, $sources, $headers);
+    } else {
+        die qq{File "$fname" is of unknown type, can't update.\n}
+    }
+}
