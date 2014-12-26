@@ -8,6 +8,7 @@ use Getopt::Long;
 
 use Makefile::Update;
 use Makefile::Update::Bakefile0;
+use Makefile::Update::Makefile;
 use Makefile::Update::MSBuild;
 
 my $verbose = 0;
@@ -95,6 +96,8 @@ foreach my $fname (@ARGV) {
         my $headers = $vars->{headers};
         log_upmake($fname, \&update_msbuild, $sources, $headers);
         log_upmake("$fname.filters", \&update_msbuild_filters, $sources, $headers);
+    } elsif ($fname =~ /^[Mm]akefile/ || $fname =~ /\.make?$/) {
+        log_upmake($fname, \&update_makefile, $vars);
     } else {
         die qq{File "$fname" is of unknown type, can't update.\n}
     }
