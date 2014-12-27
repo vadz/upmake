@@ -140,7 +140,7 @@ sub update_msbuild
                         # We have just the opening <ClCompile> tag, ignore
                         # everything until the next </ClCompile>
                         while (<$in>) {
-                            last if m{^\s*</ClCompile>$};
+                            last if m{^\s*</ClCompile>\r?\n$};
                         }
                     }
 
