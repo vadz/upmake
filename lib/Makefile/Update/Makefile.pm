@@ -28,12 +28,14 @@ Makefile::Update
 Update variable definitions in a makefile format with the data from the hash
 ref containing all the file lists.
 
-Only most straightforward cases of variable definitions are recognized here,
-i.e. just "var := value" or "var = value", in particular we don't support any
-GNU make extensions such as "export" or "override" without speaking of
-anything more complex. On top of it, currently the value should contain a
-single file per line with none at all on the first line (but this restriction
-could be relaxed later if needed), i.e. the only supported case is
+Only most straightforward cases of variable or target definitions are
+recognized here, i.e. just "var := value", "var = value" or "target: value".
+In particular we don't support any GNU make extensions such as "export" or
+"override" without speaking of anything more complex.
+
+On top of it, currently the value should contain a single file per line with
+none at all on the first line (but this restriction could be relaxed later if
+needed), i.e. the only supported case is
 
     var = \
           foo \
@@ -108,10 +110,13 @@ sub update_makefile
 
                 $tail = $last_tail if !defined $tail;
 
-                # Check if we have to mangle its extension.
+                # Check if we have something with the correct extension and
+                # preserve unchanged all the rest -- we don't want to remove
+                # expansions of other makefile variables from this one, for
+                # example, but such expansions would never be in the files
+                # list as they don't make sense for the other formats.
                 my $file = $file_orig;
-                my $file_ext = _get_ext($file);
-                if (defined $file_ext) {
+                if (defined (my $file_ext = _get_ext($file))) {
                     if (defined $make_ext) {
                         if ($file_ext ne $make_ext) {
                             warn qq{Values of variable "$var" use both } .
@@ -124,34 +129,29 @@ sub update_makefile
                     if ($file_ext ne $src_ext) {
                         $file =~ s/\Q$file_ext\E$/$src_ext/
                     }
-                }
 
-                if (exists $files{$file}) {
-                    if ($files{$file}) {
-                        warn qq{Duplicate file "$file" in the definition of the } .
-                             qq{variable "$var" at line $.\n}
-                    } else {
-                        $files{$file} = 1;
-                    }
-
-                    if (@values && lc $line lt $values[-1]) {
-                        $sorted = 0;
-                    }
-
-                    push @values, $line;
-                } else {
-                    # It's common for makefile variable definitions to contain
-                    # references to other makefile variables, which are not
-                    # going to be present in our files list, so ignore them
-                    # instead of removing them.
-                    if ($file =~ /\$\(\w+\)/) {
-                        push @values, $line;
+                    if (exists $files{$file}) {
+                        if ($files{$file}) {
+                            warn qq{Duplicate file "$file" in the definition of the } .
+                                 qq{variable "$var" at line $.\n}
+                        } else {
+                            $files{$file} = 1;
+                        }
                     } else {
                         # This file was removed.
                         $changed = 1;
+
+                        # Don't store this line in @values below.
+                        next;
                     }
                 }
 
+                # Are we still sorted?
+                if (@values && lc $line lt $values[-1]) {
+                    $sorted = 0;
+                }
+
+                push @values, $line;
                 next;
             }
 
@@ -205,8 +205,8 @@ sub update_makefile
             print $out join("\n", @values), "\n";
         }
 
-        # We're only interested in variable declarations.
-        if ($line =~ /^\s*(?<var>\w+)\s*:?=(?<tail>.*)/) {
+        # We're only interested in variable or target declarations.
+        if ($line =~ /^\s*(?<var>\S+)\s*(?::?=|:)(?<tail>.*)/) {
             $var = $+{var};
             my $tail = $+{tail};
 
@@ -224,6 +224,10 @@ sub update_makefile
                     $var = $var_if_exists->('sources');
                 } elsif ($var =~ /^(\w+)_(objects|obj|sources|src|headers|hdr)$/i) {
                     $var = $var_if_exists->($1) or $var_if_exists->("$1_sources");
+                } elsif ($var =~ /^(\w+)\$\(\w+\)/) {
+                    # This one is meant to catch relatively common makefile
+                    # constructions like "target$(exe_ext)".
+                    $var = $var_if_exists->($1);
                 } else {
                     undef $var;
                 }
