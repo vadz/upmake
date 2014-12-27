@@ -115,7 +115,8 @@ sub update_msbuild
             $in_group = 0;
         } elsif ($in_group) {
             if ($line =~ m{^\s*<Cl(?<kind>Compile|Include) Include="(?<file>[^"]+)"\s*(?<slash>/)?>$}) {
-                if ($+{kind} eq 'Compile') {
+                my $kind = $+{kind};
+                if ($kind eq 'Compile') {
                     warn "Mix of sources and headers at line $.\n" if $in_headers;
                     $in_sources = 1;
                     $files = \%sources;
@@ -137,10 +138,11 @@ sub update_msbuild
                     $changed = 1;
 
                     if (!$closed_tag) {
-                        # We have just the opening <ClCompile> tag, ignore
-                        # everything until the next </ClCompile>
+                        # We have just the opening <ClCompile> or <ClInclude>
+                        # tag, ignore everything until the matching closing one.
+                        my $tag = "Cl$kind";
                         while (<$in>) {
-                            last if m{^\s*</ClCompile>\r?\n$};
+                            last if m{^\s*</$tag>\r?\n$};
                         }
                     }
 
