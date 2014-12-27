@@ -28,12 +28,11 @@ Makefile::Update
 
 Update sources and headers in an MSBuild project and filter files.
 
-Pass the path to the path of the project to update as parameter and the
-references to the sources and headers arrays. If sources and headers are not
-specified, read the C<files> file in the directory of the project file and
-uses "sources" and "headers" variables defined in it.
+Pass the path of the project to update as parameter and the references to the
+sources and headers arrays.
 
-Returns 1 if any changes were made.
+Returns 1 if any changes were made, either to the project itself or to its
+associated C<.filters> file.
 =cut
 
 sub update_msbuild_project
@@ -41,20 +40,6 @@ sub update_msbuild_project
     my ($project_fname, $sources, $headers) = @_;
 
     use Makefile::Update;
-
-    if (!defined($sources) && !defined($headers)) {
-        require File::Spec;
-
-        my ($volume, $dirs) = File::Spec->splitpath($project_fname);
-        my $files_fname = File::Spec->catpath($volume, $dirs, 'files');
-
-        open my $files, '<', $files_fname or
-            die qq{Can't read the files list from "$files_fname".\n};
-
-        my $vars = Makefile::Update::read_files_list($files);
-        $sources = $vars->{sources};
-        $headers = $vars->{headers};
-    }
 
     if (!Makefile::Update::upmake($project_fname,
                 \&update_msbuild, $sources, $headers
