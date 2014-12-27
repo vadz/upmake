@@ -1,5 +1,50 @@
 #!/usr/bin/env perl
 
+# PODNAME: upmake
+#
+# ABSTRACT: Simple script to update list of files in a make or project file.
+
+=head1 SYNOPSIS
+
+upmake <file-to-update> [<file-to-update>...]
+
+For example:
+
+  upmake GNUmakefile myproject.vcxproj
+
+to update the source/header files listed in the makefile and project file
+from the master file list in the "files" file.
+
+=head1 DESCRIPTION
+
+This script can be used to update the list of source and possible header files
+in make and/or project files. It is useful for projects that can be built by
+different tools as it allows to have a single master list of the files used in
+the project and update all the rest automatically.
+
+The master list of files is assumed to be in the file named just C<"files"> in
+the current working directory.
+
+=head1 OPTIONS
+
+C<--quiet> and C<--verbose> options control the script output in the expected
+way. The latter modifies the behaviour of C<--dry-run> option which on its own
+would just output if the files would be updated or not, to show a unified diff
+with the changes that would be done to them.
+
+The C<--sources> and C<--headers> options are mostly useful when updating a
+project file, to specify the variables which contain the sources and headers
+to use in them. They can be repeated several times to combine the values of
+several variables. Notice that by using Makefile::Update module directly, it
+is possible to manipulate the files list in more advanced ways, e.g. adjust
+the file paths, the command line script covers only the most common case.
+
+=head1 SEE ALSO
+
+L<Makefile::Update>
+
+=cut
+
 use strict;
 use warnings;
 use autodie;
