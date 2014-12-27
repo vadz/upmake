@@ -42,6 +42,11 @@ could be relaxed later if needed), i.e. the only supported case is
 
 and it must be followed by an empty line, too.
 
+Notice that if any of the "files" in the variable value looks like a makefile
+variable, i.e. has "$(foo)" form, it is ignored by this function, i.e. not
+removed even if it doesn't appear in the list of files (which will never be
+the case normally).
+
 Takes the (open) file handles of the files to read and to write and the file
 lists hash ref as arguments.
 
@@ -135,8 +140,16 @@ sub update_makefile
 
                     push @values, $line;
                 } else {
-                    # This file was removed.
-                    $changed = 1;
+                    # It's common for makefile variable definitions to contain
+                    # references to other makefile variables, which are not
+                    # going to be present in our files list, so ignore them
+                    # instead of removing them.
+                    if ($file =~ /\$\(\w+\)/) {
+                        push @values, $line;
+                    } else {
+                        # This file was removed.
+                        $changed = 1;
+                    }
                 }
 
                 next;
