@@ -3,6 +3,8 @@
 # PODNAME: upmake
 #
 # ABSTRACT: Simple script to update list of files in a make or project file.
+#
+# VERSION
 
 =head1 SYNOPSIS
 
@@ -62,13 +64,14 @@ my $dry_run = 0;
 my (@sources_vars, @headers_vars);
 
 GetOptions(
+        'version'        => sub { print "$0 version $Makefile::Update::VERSION.\n"; exit },
         'verbose|v'      => \$verbose,
         'quiet|q'        => \$quiet,
         'dry-run|n'      => \$dry_run,
         'sources|s=s'    => \@sources_vars,
         'headers|h=s'    => \@headers_vars,
     ) and (@ARGV > 0) or die <<EOF
-Usage: $0 [--verbose] [--quiet] [--dry-run|-n] <file-to-update...>
+Usage: $0 [--version] [--verbose] [--quiet] [--dry-run|-n] <file-to-update...>
 
 Update the sources and headers files used in the specified make/project
 file(s) from the list of files in "files" file in the current directory.
