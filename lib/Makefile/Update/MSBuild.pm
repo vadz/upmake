@@ -4,6 +4,9 @@ package Makefile::Update::MSBuild;
 use Exporter qw(import);
 our @EXPORT = qw(update_msbuild_project update_msbuild update_msbuild_filters);
 
+use strict;
+use warnings;
+
 # VERSION
 
 =head1 SYNOPSIS

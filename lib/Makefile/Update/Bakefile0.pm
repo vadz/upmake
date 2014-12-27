@@ -4,6 +4,9 @@ package Makefile::Update::Bakefile0;
 use Exporter qw(import);
 our @EXPORT = qw(update_bakefile_0);
 
+use strict;
+use warnings;
+
 # VERSION
 
 =head1 SYNOPSIS
