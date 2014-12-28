@@ -1,0 +1,15 @@
+Revision history for Perl module Makefile::Update.
+
+{{$NEXT}}
+
+  * Added changelog.
+
+0.2	2014-12-28T03:12:34Z
+
+  * Added support for updating makefiles and older MSVC++ project files.
+  * Initial CPAN release.
+
+0.1	2014-05-30T23:59:53Z
+
+  * Implements updating MSBuild project files.
+  * Initial release as part of wxWidgets project.
