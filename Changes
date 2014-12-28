@@ -3,6 +3,7 @@ Revision history for Perl module Makefile::Update.
 {{$NEXT}}
 
   * Added changelog.
+  * Correct meta-information in the module description.
 
 0.2	2014-12-28T03:12:34Z
 
