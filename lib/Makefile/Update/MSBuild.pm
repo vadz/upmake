@@ -20,7 +20,7 @@ the list of files in them to correspond to the given ones.
 
 =head1 SEE ALSO
 
-Makefile::Update
+Makefile::Update, Makefile::Update::VCProj
 
 =cut
 

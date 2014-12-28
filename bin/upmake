@@ -57,6 +57,7 @@ use Makefile::Update;
 use Makefile::Update::Bakefile0;
 use Makefile::Update::Makefile;
 use Makefile::Update::MSBuild;
+use Makefile::Update::VCProj;
 
 my $verbose = 0;
 my $quiet = 0;
@@ -144,6 +145,38 @@ my $files_list = 'files';
 open my $files, '<', $files_list;
 my $vars = read_files_list($files);
 
+sub get_sources_and_headers
+{
+    my @sources;
+    for (@sources_vars) {
+        if (!defined $vars->{$_}) {
+            die qq{Invalid --sources option: variable "$_" is not } .
+                qq{defined in the "$files_list" file.\n}
+        }
+
+        push @sources, @{$vars->{$_}};
+    }
+
+    my @headers;
+    for (@headers_vars) {
+        if (!defined $vars->{$_}) {
+            die qq{Invalid --headers option: variable "$_" is not } .
+                qq{defined in the "$files_list" file.\n}
+        }
+
+        push @headers, @{$vars->{$_}};
+    }
+
+    my $sources = @sources ? \@sources : $vars->{sources};
+    my $headers = @headers ? \@headers : $vars->{headers};
+    if (!defined $sources || !@$sources) {
+        die qq{No sources specified, define "sources" variable in the } .
+            qq{"$files_list" file or use --sources option.\n}
+    }
+
+    return ($sources, $headers)
+}
+
 foreach my $fname (@ARGV) {
     # What kind of file is it?
     if ($fname =~ /\.bkl$/) {
@@ -151,35 +184,11 @@ foreach my $fname (@ARGV) {
             print qq{Don't forget to run bakefile or bakefile_gen now.} if $verbose;
         }
     } elsif ($fname =~ /\.vcxproj$/) {
-        my @sources;
-        for (@sources_vars) {
-            if (!defined $vars->{$_}) {
-                die qq{Invalid --sources option: variable "$_" is not } .
-                    qq{defined in the "$files_list" file.\n}
-            }
-
-            push @sources, @{$vars->{$_}};
-        }
-
-        my @headers;
-        for (@headers_vars) {
-            if (!defined $vars->{$_}) {
-                die qq{Invalid --headers option: variable "$_" is not } .
-                    qq{defined in the "$files_list" file.\n}
-            }
-
-            push @headers, @{$vars->{$_}};
-        }
-
-        my $sources = @sources ? \@sources : $vars->{sources};
-        my $headers = @headers ? \@headers : $vars->{headers};
-        if (!defined $sources || !@$sources) {
-            die qq{No sources specified, define "sources" variable in the } .
-                qq{"$files_list" file or use --sources option.\n}
-        }
-
+        my ($sources, $headers) = get_sources_and_headers();
         log_upmake($fname, \&update_msbuild, $sources, $headers);
         log_upmake("$fname.filters", \&update_msbuild_filters, $sources, $headers);
+    } elsif ($fname =~ /\.vcproj$/) {
+        log_upmake($fname, \&update_vcproj, get_sources_and_headers());
     } elsif ($fname =~ /^[Mm]akefile/ || $fname =~ /\.make?$/) {
         log_upmake($fname, \&update_makefile, $vars);
     } else {
