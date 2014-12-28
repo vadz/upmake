@@ -19,10 +19,10 @@ the usual way:
 
 It can also be installed from [CPAN](https://metacpan.org/) in the usual way.
 
-Alternatively, you can download a single file containing the latest version of
-the command line script with all its dependencies, but this won't allow you to
-use its functionality programmatically which is usually required for
-non-trivial projects.
+Alternatively, you can [download a single file](http://www.tt-solutions.com/downloads/upmake)
+containing the latest version of the command line script with all its
+dependencies, but this won't allow you to use its functionality
+programmatically which is usually required for non-trivial projects.
 
 
 Usage
