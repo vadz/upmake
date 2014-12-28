@@ -5,7 +5,10 @@ perl:
     - "5.14"
     - "5.20"
 
-install: "dzil listdeps|cpanm"
+install:
+    - "dzil listdeps | cpanm"
+    - "dzil authordeps --missing | cpanm"
+
 script: "dzil test --release"
 
 notifications:
