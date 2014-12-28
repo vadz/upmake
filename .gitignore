@@ -1,1 +1,3 @@
 .build
+Makefile-Update-*/
+Makefile-Update-*.tar.gz
