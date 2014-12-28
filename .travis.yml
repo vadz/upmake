@@ -1,0 +1,14 @@
+# Travis CI configuration for upmake.
+language: perl
+perl:
+    - "5.10"
+    - "5.14"
+    - "5.20"
+
+install: "dzil listdeps|cpanm"
+script: "dzil test --release"
+
+notifications:
+  email:
+    recipients:
+      - vz-upmake@zeitlins.org
