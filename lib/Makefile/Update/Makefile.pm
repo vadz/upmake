@@ -155,8 +155,11 @@ sub update_makefile
                 next;
             }
 
-            # The variable definition is expected to end with a blank line.
-            warn qq{Expected blank line at line $..\n} if $line =~ /\S/;
+            # If the last line had a continuation character, the file list
+            # should only end if there is nothing else on the following line.
+            if ($last_tail =~ /\\$/ && $line =~ /\S/) {
+                warn qq{Expected blank line at line $..\n};
+            }
 
             # End of variable definition, add new lines.
             my $new_files = 0;
