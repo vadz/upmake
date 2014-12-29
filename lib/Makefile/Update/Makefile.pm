@@ -99,7 +99,7 @@ sub update_makefile
             if ($line =~ /^(?<indent>\s*)(?<file>[^ ]+)(?<tail>\s*\\?)$/) {
                 if (defined $indent) {
                     warn qq{Inconsistent indent at line $. in the } .
-                         qq{definition of the variable "$var".\n"}
+                         qq{definition of the variable "$var".\n}
                         if $+{indent} ne $indent;
                 } else {
                     $indent = $+{indent};
