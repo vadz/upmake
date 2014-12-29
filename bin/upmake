@@ -34,13 +34,6 @@ way. The latter modifies the behaviour of C<--dry-run> option which on its own
 would just output if the files would be updated or not, to show a unified diff
 with the changes that would be done to them.
 
-The C<--sources> and C<--headers> options are mostly useful when updating a
-project file, to specify the variables which contain the sources and headers
-to use in them. They can be repeated several times to combine the values of
-several variables. Notice that by using Makefile::Update module directly, it
-is possible to manipulate the files list in more advanced ways, e.g. adjust
-the file paths, the command line script covers only the most common case.
-
 =head1 SEE ALSO
 
 L<Makefile::Update>
@@ -62,26 +55,17 @@ use Makefile::Update::VCProj;
 my $verbose = 0;
 my $quiet = 0;
 my $dryrun = 0;
-my (@sources_vars, @headers_vars);
 
 GetOptions(
         'version'        => sub { print "$0 version $Makefile::Update::VERSION.\n"; exit },
         'verbose|v'      => \$verbose,
         'quiet|q'        => \$quiet,
         'dry-run|n'      => \$dryrun,
-        'sources|s=s'    => \@sources_vars,
-        'headers|h=s'    => \@headers_vars,
     ) and (@ARGV > 0) or die <<EOF
 Usage: $0 [--version] [--verbose] [--quiet] [--dry-run|-n] <file-to-update...>
 
 Update the sources and headers files used in the specified make/project
 file(s) from the list of files in "files" file in the current directory.
-
-If --sources and/or --headers options are given, use the names of the
-variables specified by them in the files list file instead of the default
-"sources" and "headers" when updating the files which use only a single
-variable for the files of each kind (e.g. project files). Both options can
-be specified multiple times to combine the values of several variables.
 
 If --dry-run option is specified, the files are not really updated, but the
 script just indicates where they would be changed and, if --verbose is also
@@ -94,34 +78,18 @@ my $files_list = 'files';
 open my $files, '<', $files_list;
 my $vars = read_files_list($files);
 
-sub get_sources_and_headers
+# Find sources and headers variables for a project file with the given name.
+sub get_project_sources_and_headers
 {
-    my @sources;
-    for (@sources_vars) {
-        if (!defined $vars->{$_}) {
-            die qq{Invalid --sources option: variable "$_" is not } .
-                qq{defined in the "$files_list" file.\n}
-        }
+    my ($proj) = @_;
 
-        push @sources, @{$vars->{$_}};
+    my $sources = $vars->{"${proj}_sources"} || $vars->{$proj} || $vars->{sources};
+    if (!defined $sources) {
+        die qq|No sources specified, define "${proj}_sources" or "sources" | .
+            qq|variable in the "$files_list" file.\n|
     }
 
-    my @headers;
-    for (@headers_vars) {
-        if (!defined $vars->{$_}) {
-            die qq{Invalid --headers option: variable "$_" is not } .
-                qq{defined in the "$files_list" file.\n}
-        }
-
-        push @headers, @{$vars->{$_}};
-    }
-
-    my $sources = @sources ? \@sources : $vars->{sources};
-    my $headers = @headers ? \@headers : $vars->{headers};
-    if (!defined $sources || !@$sources) {
-        die qq{No sources specified, define "sources" variable in the } .
-            qq{"$files_list" file or use --sources option.\n}
-    }
+    my $headers = $vars->{"${proj}_headers"} || $vars->{headers};
 
     return ($sources, $headers)
 }
@@ -140,14 +108,14 @@ foreach my $fname (@ARGV) {
         if (upmake($options, \&update_bakefile_0, $vars)) {
             print qq{Don't forget to run bakefile or bakefile_gen now.} if $verbose;
         }
-    } elsif ($fname =~ /\.vcxproj$/) {
-        my ($sources, $headers) = get_sources_and_headers();
+    } elsif ($fname =~ /(.*)\.vcxproj$/) {
+        my ($sources, $headers) = get_project_sources_and_headers($1);
         upmake($options, \&update_msbuild, $sources, $headers);
 
         $options->{file} = "$fname.filters";
         upmake($options, \&update_msbuild_filters, $sources, $headers);
-    } elsif ($fname =~ /\.vcproj$/) {
-        upmake($options, \&update_vcproj, get_sources_and_headers());
+    } elsif ($fname =~ /(.*)\.vcproj$/) {
+        upmake($options, \&update_vcproj, get_project_sources_and_headers($1));
     } elsif ($fname =~ /^[Mm]akefile/ || $fname =~ /\.make?$/) {
         upmake($options, \&update_makefile, $vars);
     } else {

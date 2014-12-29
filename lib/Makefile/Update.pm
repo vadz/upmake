@@ -30,6 +30,10 @@ Takes an (open) file handle as argument.
 The file contents is supposed to have the following very simple format:
 
     # Comments are allowed and ignored.
+    #
+    # The variable definitions must always be in the format shown below,
+    # i.e. whitespace is significant and there should always be a single
+    # file per line.
     sources =
         file1.cpp
         file2.cpp
@@ -37,13 +41,20 @@ The file contents is supposed to have the following very simple format:
     headers =
         file1.h
         file2.h
+
+    # It is also possible to define variables in terms of other variables
+    # defined before it in the file (no forward references and no mixing
+    # of the variables and files as would be possible in real makefiles):
+    everything <-
+        sources
+        headers
 =cut
 
 sub read_files_list
 {
     my ($fh) = @_;
 
-    my ($var, %vars);
+    my ($var, %vars, $deref);
     while (<$fh>) {
         chomp;
         s/#.*$//;
@@ -51,12 +62,21 @@ sub read_files_list
         s/\s+$//;
         next if !$_;
 
-        if (/^(\w+)\s*=$/) {
+        if (/^(\w+)\s*(=|<-)$/) {
             $var = $1;
+            $deref = $2 eq '<-';
         } else {
             die "Unexpected contents outside variable definition at line $.\n"
                 unless defined $var;
-            push @{$vars{$var}}, $_;
+            if ($deref) {
+                die qq{Reference to undefined variable "$_" in the assignment } .
+                    qq{to "$var" at line $.\n}
+                    unless exists $vars{$_};
+                my $value = $vars{$_};
+                push @{$vars{$var}}, $_ for @$value;
+            } else {
+                push @{$vars{$var}}, $_;
+            }
         }
     }
 

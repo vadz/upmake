@@ -68,11 +68,23 @@ modifications conform to your expectations before actually making them.
 
 Generally speaking, any variables or targets defined in the makefile will be
 updated with the values of the variables with the corresponding names from the
-master file (and if there is no corresponding variable, nothing is done). If
-there is more than one variable, it probably won't be called just `sources`,
-in which case you would need to use `--sources=<var>` option to indicate which
-of them should be used for the sources in the project files (notice that this
-option may be specified more than once).
+master file (and if there is no corresponding variable, nothing is done). As
+for project files, variables `proj_sources`, `proj` and `sources` where `proj`
+is the base name of the project are used by default in this order, i.e. the
+first one found is used (for the headers, only `proj_headers` and `headers`
+are checked).
+
+A common situation is that an existing makefile uses several variables, e.g.
+`sources_foo` and `sources_bar`, while a single variable containing all the
+sources is needed for the project file. This can be resolved by defining such
+variable in terms of other existing ones:
+
+	# This is exactly the same format as above, except using "<-": this
+	# indicates that all values are names of (already existing) variables and
+	# not files.
+	proj_sources <-
+		sources_foo
+		sources_bar
 
 For yet more complicated cases you may use the module programmatically, see
 e.g. [this example](https://github.com/wxWidgets/wxWidgets/blob/master/build/upmake).
