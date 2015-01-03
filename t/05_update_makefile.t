@@ -8,7 +8,8 @@ BEGIN { use_ok('Makefile::Update::Makefile'); }
 my $vars = {
         VAR1 => [qw(file1 file2 fileNew)],
         VAR2 => [qw(file0.c file3.c file4.c file5.c fileNew2.c)],
-        foo => [qw(foo.cpp bar.cpp)],
+        prog => [qw(prog.cpp)],
+        foo  => [qw(foo.cpp bar.cpp)],
     };
 
 open my $out, '>', \my $outstr;
@@ -24,6 +25,7 @@ like($outstr, qr/fileNew2\.o \\$/m, 'another new file was added with backslash')
 like($outstr, qr/file0\.o \\\s+file3\.o/s, 'new file added in correct order');
 like($outstr, qr/file3\.o \\\s+file4\.o/s, 'existing files remain in correct order');
 like($outstr, qr/bar\.\$\(OBJ\) \\\s+foo\.\$\(OBJ\)/, 'baz.$(OBJ) was removed from the file list');
+like($outstr, qr/\$\(extra_libs\)/, '$(extra_libs) was preserved');
 
 # Test that different make variables (specified as first element of the array)
 # are updated with the values of our variable with the given name (specified
@@ -72,6 +74,11 @@ VAR2_OBJECTS := \
     file4.o \
     file5.o \
     fileOld.o \
+
+# Targets can be updated too and variables in them are preserved.
+prog: \
+    prog.o \
+    $(extra_libs)
 
 # Using variable for the extension should still work.
 foo$(EXE): \
