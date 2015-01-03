@@ -6,12 +6,13 @@ perl:
     - "5.20"
 
 env:
-    - PERL_CPANM_OPT="--notest --force --skip-satisfied"
-    - RELEASE_TESTING=1
-    - AUTOMATED_TESTING=1
-    - AUTHOR_TESTING=1
-    - HARNESS_OPTIONS=c
-    - HARNESS_TIMER=1
+    global:
+        - PERL_CPANM_OPT="--notest --force --skip-satisfied"
+        - RELEASE_TESTING=1
+        - AUTOMATED_TESTING=1
+        - AUTHOR_TESTING=1
+        - HARNESS_OPTIONS=c
+        - HARNESS_TIMER=1
 
 install:
     - "dzil listdeps | cpanm"
@@ -20,8 +21,7 @@ install:
     - cpanm Devel::Cover::Report::Coveralls
 
 script:
-    - dzil build --in=dist
-    - cd dist
+    - dzil build
     - PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine prove -lrv t
     - cover
 

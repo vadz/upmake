@@ -1,7 +1,7 @@
 Upmake
 ======
 
-[![Build Status](https://travis-ci.org/vadz/upmake.png?branch=master)](https://travis-ci.org/vadz/upmake)
+[![Build Status](https://travis-ci.org/vadz/upmake.png?branch=master)](https://travis-ci.org/vadz/upmake) [![Coverage Status](https://coveralls.io/repos/vadz/upmake/badge.png?branch=master)](https://coveralls.io/r/vadz/upmake?branch=master)
 
 Pragmatic way to manage build system for cross-platform applications: update
 the lists of source and header files in all the make and project files at
