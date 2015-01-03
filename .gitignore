@@ -1,3 +1,4 @@
-.build
+.build/
+cover_db/
 Makefile-Update-*/
 Makefile-Update-*.tar.gz
