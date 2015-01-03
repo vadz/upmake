@@ -229,7 +229,7 @@ sub update_makefile
                     # source, not object, files.
                     $var = $var_if_exists->('sources');
                 } elsif ($makevar =~ /^(\w+)_(objects|obj|sources|src|headers|hdr)$/i) {
-                    $var = $var_if_exists->($1) or $var_if_exists->("$1_sources");
+                    $var = $var_if_exists->($1) || $var_if_exists->("$1_sources");
                 } elsif ($makevar =~ /^(\w+)\$\(\w+\)/) {
                     # This one is meant to catch relatively common makefile
                     # constructions like "target$(exe_ext)".
