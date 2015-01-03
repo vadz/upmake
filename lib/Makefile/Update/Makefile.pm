@@ -229,7 +229,20 @@ sub update_makefile
                     # source, not object, files.
                     $var = $var_if_exists->('sources');
                 } elsif ($makevar =~ /^(\w+)_(objects|obj|sources|src)$/i) {
+                    # Here we deal with "foo_sources" typically found in
+                    # hand-written makefiles but also "foo_SOURCES" used in
+                    # automake ones, but the latter also uses libfoo_a_SOURCES
+                    # for static libraries and libfoo_la_SOURCES for the
+                    # libtool libraries, be smart about it to allow defining
+                    # just "foo" or "foo_sources" variables usable with all
+                    # kinds of make/project files.
                     $var = $var_if_exists->($1) || $var_if_exists->("$1_sources");
+                    if (!defined $var && $2 eq 'SOURCES' && $1 =~ /^(\w+)_l?a$/) {
+                        $var = $var_if_exists->($1) || $var_if_exists->("$1_sources");
+                        if (!defined $var && $1 =~ /^lib(\w+)$/) {
+                            $var = $var_if_exists->($1) || $var_if_exists->("$1_sources");
+                        }
+                    }
                 } elsif ($makevar =~ /^(\w+)\$\(\w+\)/) {
                     # This one is meant to catch relatively common makefile
                     # constructions like "target$(exe_ext)".

@@ -34,6 +34,10 @@ my @test_make_vars = (
         [qw(objects             sources     )],
         [qw(foo_objects         foo         )],
         [qw(foo_objects         foo_sources )],
+        [qw(foo_sources         foo         )],
+        [qw(foo_a_SOURCES       foo         )],
+        [qw(foo_la_SOURCES      foo         )],
+        [qw(libfoo_la_SOURCES   foo         )],
     );
 
 # Return a makefile fragment defining the given variable with the given value.
