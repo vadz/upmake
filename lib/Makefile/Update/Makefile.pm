@@ -228,7 +228,7 @@ sub update_makefile
                     # Special case: map it to "sources" as we work with the
                     # source, not object, files.
                     $var = $var_if_exists->('sources');
-                } elsif ($makevar =~ /^(\w+)_(objects|obj|sources|src|headers|hdr)$/i) {
+                } elsif ($makevar =~ /^(\w+)_(objects|obj|sources|src)$/i) {
                     $var = $var_if_exists->($1) || $var_if_exists->("$1_sources");
                 } elsif ($makevar =~ /^(\w+)\$\(\w+\)/) {
                     # This one is meant to catch relatively common makefile
