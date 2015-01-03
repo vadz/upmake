@@ -22,7 +22,7 @@ install:
 
 script:
     - dzil build
-    - PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine prove -lrv t
+    - PERL5OPT="-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine+ignore=prove" prove -lrv t
     - cover
 
 after_success:
