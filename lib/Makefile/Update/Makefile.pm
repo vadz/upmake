@@ -59,8 +59,9 @@ sub update_makefile
 {
     my ($in, $out, $vars) = @_;
 
-    # Variable whose contents is being currently replaced.
-    my $var;
+    # Variable whose contents is being currently replaced and its original
+    # name in the makefile.
+    my ($var, $makevar);
 
     # Hash with files defined for the specified variable as keys and 0 or 1
     # depending on whether we have seen them in the input file as values.
@@ -99,7 +100,7 @@ sub update_makefile
             if ($line =~ /^(?<indent>\s*)(?<file>[^ ]+)(?<tail>\s*\\?)$/) {
                 if (defined $indent) {
                     warn qq{Inconsistent indent at line $. in the } .
-                         qq{definition of the variable "$var".\n}
+                         qq{definition of the variable "$makevar".\n}
                         if $+{indent} ne $indent;
                 } else {
                     $indent = $+{indent};
@@ -119,7 +120,7 @@ sub update_makefile
                 if (defined (my $file_ext = _get_ext($file))) {
                     if (defined $make_ext) {
                         if ($file_ext ne $make_ext) {
-                            warn qq{Values of variable "$var" use both } .
+                            warn qq{Values of variable "$makevar" use both } .
                                  qq{"$file_ext" and "$make_ext" extensions.\n};
                         }
                     } else {
@@ -133,7 +134,7 @@ sub update_makefile
                     if (exists $files{$file}) {
                         if ($files{$file}) {
                             warn qq{Duplicate file "$file" in the definition of the } .
-                                 qq{variable "$var" at line $.\n}
+                                 qq{variable "$makevar" at line $.\n}
                         } else {
                             $files{$file} = 1;
                         }
@@ -210,35 +211,35 @@ sub update_makefile
 
         # We're only interested in variable or target declarations.
         if ($line =~ /^\s*(?<var>\S+)\s*(?::?=|:)(?<tail>.*)/) {
-            $var = $+{var};
+            $makevar = $+{var};
             my $tail = $+{tail};
 
             # And only those of them for which we have values, but this is
             # where it gets tricky as we try to be smart to accommodate common
             # use patterns with minimal effort.
-            if (!exists $vars->{$var}) {
+            if (exists $vars->{$makevar}) {
+                $var = $makevar;
+            } else {
                 # Helper: return name if a variable with such name exists or
                 # undef otherwise.
                 my $var_if_exists = sub { exists $vars->{$_[0]} ? $_[0] : undef };
 
-                if ($var =~ /^objects$/i || $var =~ /^obj$/i) {
+                if ($makevar =~ /^objects$/i || $makevar =~ /^obj$/i) {
                     # Special case: map it to "sources" as we work with the
                     # source, not object, files.
                     $var = $var_if_exists->('sources');
-                } elsif ($var =~ /^(\w+)_(objects|obj|sources|src|headers|hdr)$/i) {
+                } elsif ($makevar =~ /^(\w+)_(objects|obj|sources|src|headers|hdr)$/i) {
                     $var = $var_if_exists->($1) or $var_if_exists->("$1_sources");
-                } elsif ($var =~ /^(\w+)\$\(\w+\)/) {
+                } elsif ($makevar =~ /^(\w+)\$\(\w+\)/) {
                     # This one is meant to catch relatively common makefile
                     # constructions like "target$(exe_ext)".
                     $var = $var_if_exists->($1);
-                } else {
-                    undef $var;
                 }
             }
 
             if (defined $var) {
                 if ($tail !~ /\s*\\$/) {
-                    warn qq{Unsupported format for variable "$var" at line $..\n};
+                    warn qq{Unsupported format for variable "$makevar" at line $..\n};
                     undef $var;
                 } else {
                     %files = map { $_ => 0 } @{$vars->{$var}};
