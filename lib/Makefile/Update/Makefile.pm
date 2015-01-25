@@ -209,8 +209,10 @@ sub update_makefile
             print $out join("\n", @values), "\n";
         }
 
-        # We're only interested in variable or target declarations.
-        if ($line =~ /^\s*(?<var>\S+)\s*(?::?=|:)(?<tail>.*)/) {
+        # We're only interested in variable or target declarations, and does
+        # not look like target-specific variable (this would contain an equal
+        # sign after the target).
+        if ($line =~ /^\s*(?<var>\S+)\s*(?::?=|:)(?<tail>[^=]*)$/) {
             $makevar = $+{var};
             my $tail = $+{tail};
 
