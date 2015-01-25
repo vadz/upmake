@@ -149,19 +149,21 @@ sub update_makefile
                         }
                     }
 
-                    if (exists $files{$file}) {
-                        if ($files{$file}) {
-                            warn qq{Duplicate file "$file" in the definition of the } .
-                                 qq{variable "$makevar" at line $.\n}
-                        } else {
-                            $files{$file} = 1;
-                        }
-                    } else {
+                    if (!exists $files{$file}) {
                         # This file was removed.
                         $changed = 1;
 
                         # Don't store this line in @values below.
                         next;
+                    }
+                }
+
+                if (exists $files{$file}) {
+                    if ($files{$file}) {
+                        warn qq{Duplicate file "$file" in the definition of the } .
+                             qq{variable "$makevar" at line $.\n}
+                    } else {
+                        $files{$file} = 1;
                     }
                 }
 
