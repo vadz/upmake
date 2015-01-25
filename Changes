@@ -2,6 +2,7 @@ Revision history for Perl module Makefile::Update.
 
 {{$NEXT}}
 
+  * [Makefile] Support lists of files with different extensions (e.g. .c/.cpp).
   * Allow defining variables in terms of other variables.
   * Added changelog.
   * Correct meta-information in the module description.

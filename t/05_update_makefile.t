@@ -8,7 +8,7 @@ BEGIN { use_ok('Makefile::Update::Makefile'); }
 
 my $vars = {
         VAR1 => [qw(file1 file2 fileNew)],
-        VAR2 => [qw(file0.c file3.c file4.c file5.c fileNew2.c)],
+        VAR2 => [qw(file0.c file3.c file4.c file5.c fileCpp.cpp fileCppNew.cpp fileNew2.c)],
         prog => [qw(prog.cpp)],
         foo  => [qw(foo.cpp bar.cpp)],
     };
@@ -28,6 +28,11 @@ lacks_string($outstr, 'fileOld', 'old file was removed');
 like_string($outstr, qr/fileNew2\.o \\$/m, 'another new file was added with backslash');
 like_string($outstr, qr/file0\.o \\\s+file3\.o/s, 'new file added in correct order');
 like_string($outstr, qr/file3\.o \\\s+file4\.o/s, 'existing files remain in correct order');
+
+lacks_string($outstr, 'fileCppOld', 'old C++ file was removed');
+contains_string($outstr, 'fileCpp.o', 'existing C++ file was preserved');
+contains_string($outstr, 'fileCppNew.o', 'new C++ file was added with correct extension');
+
 # The rest of them.
 like_string($outstr, qr/bar\.\$\(OBJ\) \\\s+foo\.\$\(OBJ\)/, 'baz.$(OBJ) was removed from the file list');
 contains_string($outstr, '$(extra_libs)', '$(extra_libs) was preserved');
@@ -82,6 +87,8 @@ VAR2_OBJECTS := \
     file3.o \
     file4.o \
     file5.o \
+    fileCpp.o \
+    fileCppOld.o \
     fileOld.o \
 
 # Targets can be updated too and variables in them are preserved.

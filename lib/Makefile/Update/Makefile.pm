@@ -75,9 +75,18 @@ sub update_makefile
     # we just append them at the end.
     my $sorted = 1;
 
-    # Extension of the files in the files list and in the makefile, can be
-    # different (e.g. ".cpp" and ".o") and we translate between them then.
-    my ($src_ext, $make_ext);
+    # Extensions of the files in the files list (they're keys of this hash,
+    # the values are not used), there can be more than one (e.g. ".c" and
+    # ".cpp").
+    my %src_exts;
+
+    # Extension of the files in the makefiles: here there can also be more
+    # than one, but in this case we just give up and don't perform any
+    # extensions translation because we don't have enough information to do it
+    # (e.g. which extension should be used for the new files in the makefile?).
+    # Such case is indicated by make_ext being empty (as opposed to its
+    # initial undefined value).
+    my $make_ext;
 
     # Helper to get the extension. Note that the "extension" may be a make
     # variable, e.g. the file could be something like "foo.$(obj)", so don't
@@ -120,15 +129,24 @@ sub update_makefile
                 if (defined (my $file_ext = _get_ext($file))) {
                     if (defined $make_ext) {
                         if ($file_ext ne $make_ext) {
-                            warn qq{Values of variable "$makevar" use both } .
-                                 qq{"$file_ext" and "$make_ext" extensions.\n};
+                            # As explained in the comment before make_ext
+                            # definition, just don't do anything in this case.
+                            $make_ext = '';
                         }
                     } else {
                         $make_ext = $file_ext;
                     }
 
-                    if ($file_ext ne $src_ext) {
-                        $file =~ s/\Q$file_ext\E$/$src_ext/
+                    # We need to try this file with all of the source
+                    # extensions we have as it can correspond to any of them.
+                    for my $src_ext (keys %src_exts) {
+                        if ($file_ext ne $src_ext) {
+                            (my $file_try = $file) =~ s/\Q$file_ext\E$/$src_ext/;
+                            if (exists $files{$file_try}) {
+                                $file = $file_try;
+                                last
+                            }
+                        }
                     }
 
                     if (exists $files{$file}) {
@@ -163,6 +181,18 @@ sub update_makefile
             }
 
             # End of variable definition, add new lines.
+
+            # We can only map the extensions if we have a single extension to
+            # map them to (i.e. make_ext is not empty) and we only need to do
+            # it if are using more than one extension in the source files list
+            # or the single extension that we use is different from make_ext.
+            if (defined $make_ext) {
+                if ($make_ext eq '' ||
+                        (keys %src_exts == 1 && exists $src_exts{$make_ext})) {
+                    undef $make_ext
+                }
+            }
+
             my $new_files = 0;
             while (my ($file, $seen) = each(%files)) {
                 next if $seen;
@@ -181,8 +211,8 @@ sub update_makefile
                 }
 
                 # Next give it the right extension.
-                if (defined $make_ext && $make_ext ne $src_ext) {
-                    $file =~ s/\Q$src_ext\E$/$make_ext/
+                if (defined $make_ext) {
+                    $file =~ s/\.\S+$/$make_ext/
                 }
 
                 # Finally store it.
@@ -261,9 +291,12 @@ sub update_makefile
 
                     @values = ();
 
-                    # We assume all files have the same extension (it's not
-                    # clear what could we do if this were not the case anyhow).
-                    $src_ext = _get_ext(${$vars->{$var}}[0]);
+                    # Find all the extensions used by files in this variable.
+                    for my $file (@{$vars->{$var}}) {
+                        if (defined (my $src_ext = _get_ext($file))) {
+                            $src_exts{$src_ext} = 1;
+                        }
+                    }
 
                     # Not known yet.
                     undef $make_ext;
