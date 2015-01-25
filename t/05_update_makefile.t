@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use autodie;
 use Test::More;
+use Test::LongString;
 
 BEGIN { use_ok('Makefile::Update::Makefile'); }
 
@@ -17,15 +18,19 @@ update_makefile(*DATA, $out, $vars);
 
 note("Result: $outstr");
 
-like($outstr, qr/file1/, 'existing file was preserved');
-like($outstr, qr/file2 \\$/m, 'trailing backslash was added');
-like($outstr, qr/fileNew$/m, 'new file was added without backslash');
-unlike($outstr, qr/fileOld/, 'old file was removed');
-like($outstr, qr/fileNew2\.o \\$/m, 'another new file was added with backslash');
-like($outstr, qr/file0\.o \\\s+file3\.o/s, 'new file added in correct order');
-like($outstr, qr/file3\.o \\\s+file4\.o/s, 'existing files remain in correct order');
-like($outstr, qr/bar\.\$\(OBJ\) \\\s+foo\.\$\(OBJ\)/, 'baz.$(OBJ) was removed from the file list');
-like($outstr, qr/\$\(extra_libs\)/, '$(extra_libs) was preserved');
+# VAR1 tests
+contains_string($outstr, 'file1', 'existing file was preserved');
+like_string($outstr, qr/file2 \\$/m, 'trailing backslash was added');
+like_string($outstr, qr/fileNew$/m, 'new file was added without backslash');
+
+# VAR2 tests
+lacks_string($outstr, 'fileOld', 'old file was removed');
+like_string($outstr, qr/fileNew2\.o \\$/m, 'another new file was added with backslash');
+like_string($outstr, qr/file0\.o \\\s+file3\.o/s, 'new file added in correct order');
+like_string($outstr, qr/file3\.o \\\s+file4\.o/s, 'existing files remain in correct order');
+# The rest of them.
+like_string($outstr, qr/bar\.\$\(OBJ\) \\\s+foo\.\$\(OBJ\)/, 'baz.$(OBJ) was removed from the file list');
+contains_string($outstr, '$(extra_libs)', '$(extra_libs) was preserved');
 
 # Test that different make variables (specified as first element of the array)
 # are updated with the values of our variable with the given name (specified
