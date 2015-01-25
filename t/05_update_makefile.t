@@ -7,7 +7,7 @@ use Test::LongString;
 BEGIN { use_ok('Makefile::Update::Makefile'); }
 
 my $vars = {
-        VAR1 => [qw(file1 file2 fileNew)],
+        VAR1 => [qw(file1.cpp file2.cpp fileNew.cpp)],
         VAR2 => [qw(file0.c file3.c file4.c file5.c fileCpp.cpp fileCppNew.cpp fileNew2.c)],
         prog => [qw(prog.cpp)],
         foo  => [qw(foo.cpp bar.cpp)],
@@ -19,9 +19,10 @@ update_makefile(*DATA, $out, $vars);
 note("Result: $outstr");
 
 # VAR1 tests
-contains_string($outstr, 'file1', 'existing file was preserved');
-like_string($outstr, qr/file2 \\$/m, 'trailing backslash was added');
-like_string($outstr, qr/fileNew$/m, 'new file was added without backslash');
+lacks_string($outstr, 'fileToRemove.cpp', 'non-existing any more file was removed');
+contains_string($outstr, 'file1.cpp', 'existing file was preserved');
+like_string($outstr, qr/file2.cpp \\$/m, 'trailing backslash was added');
+like_string($outstr, qr/fileNew.cpp$/m, 'new file was added without backslash');
 
 # VAR2 tests
 lacks_string($outstr, 'fileOld', 'old file was removed');
@@ -79,8 +80,9 @@ done_testing()
 __DATA__
 # Simplest case.
 VAR1 = \
-       file1 \
-       file2
+       fileToRemove.cpp \
+       file1.cpp \
+       file2.cpp
 
 # More typical case, using object files.
 VAR2_OBJECTS := \
