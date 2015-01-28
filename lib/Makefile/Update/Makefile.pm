@@ -306,6 +306,9 @@ sub update_makefile
                     undef $indent;
                     $tail = $tail;
                     undef $last_tail;
+
+                    # Not unsorted so far.
+                    $sorted = 1;
                 }
             }
         }
