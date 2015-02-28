@@ -15,8 +15,8 @@ env:
         - HARNESS_TIMER=1
 
 install:
-    - "dzil authordeps --missing | tee >(cat) | cpanm"
-    - "dzil listdeps | tee >(cat) | cpanm"
+    - "dzil authordeps --missing | cpanm"
+    - "dzil listdeps | cpanm"
     - "cpanm Pod::Coverage::TrustPod"
     - cpanm Devel::Cover::Report::Coveralls
 
