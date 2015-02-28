@@ -25,6 +25,6 @@ VAR2 =
     file4 # comment
     # another comment
 
-ALL <-
-    VAR1
-    VAR2
+ALL =
+    $VAR1
+    $VAR2

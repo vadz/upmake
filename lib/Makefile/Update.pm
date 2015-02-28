@@ -43,18 +43,17 @@ The file contents is supposed to have the following very simple format:
         file2.h
 
     # It is also possible to define variables in terms of other variables
-    # defined before it in the file (no forward references and no mixing
-    # of the variables and files as would be possible in real makefiles):
-    everything <-
-        sources
-        headers
+    # defined before it in the file (no forward references):
+    everything =
+        $sources
+        $headers
 =cut
 
 sub read_files_list
 {
     my ($fh) = @_;
 
-    my ($var, %vars, $deref);
+    my ($var, %vars);
     while (<$fh>) {
         chomp;
         s/#.*$//;
@@ -62,17 +61,17 @@ sub read_files_list
         s/\s+$//;
         next if !$_;
 
-        if (/^(\w+)\s*(=|<-)$/) {
+        if (/^(\w+)\s*=$/) {
             $var = $1;
-            $deref = $2 eq '<-';
         } else {
             die "Unexpected contents outside variable definition at line $.\n"
                 unless defined $var;
-            if ($deref) {
-                die qq{Reference to undefined variable "$_" in the assignment } .
-                    qq{to "$var" at line $.\n}
-                    unless exists $vars{$_};
-                my $value = $vars{$_};
+            if (/^\$(\w+)$/) {
+                my $name = $1;
+                die qq{Reference to undefined variable "$name" in the } .
+                    qq{assignment to "$var" at line $.\n}
+                    unless exists $vars{$name};
+                my $value = $vars{$name};
                 push @{$vars{$var}}, $_ for @$value;
             } else {
                 push @{$vars{$var}}, $_;

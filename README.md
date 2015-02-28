@@ -79,12 +79,9 @@ A common situation is that an existing makefile uses several variables, e.g.
 sources is needed for the project file. This can be resolved by defining such
 variable in terms of other existing ones:
 
-	# This is exactly the same format as above, except using "<-": this
-	# indicates that all values are names of (already existing) variables and
-	# not files.
-	proj_sources <-
-		sources_foo
-		sources_bar
+	proj_sources =
+		$sources_foo
+		$sources_bar
 
 For yet more complicated cases you may use the module programmatically, see
 e.g. [this example](https://github.com/wxWidgets/wxWidgets/blob/master/build/upmake).
