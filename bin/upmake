@@ -106,7 +106,7 @@ foreach my $fname (@ARGV) {
     # What kind of file is it?
     if ($fname =~ /\.bkl$/) {
         if (upmake($options, \&update_bakefile_0, $vars)) {
-            print qq{Don't forget to run bakefile or bakefile_gen now.} if $verbose;
+            print qq{Don't forget to run bakefile or bakefile_gen now.\n} if $verbose;
         }
     } elsif ($fname =~ /(.*)\.vcxproj$/) {
         my ($sources, $headers) = get_project_sources_and_headers($1);
