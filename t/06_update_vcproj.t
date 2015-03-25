@@ -19,6 +19,8 @@ like($outstr, qr/fileNew\.cpp/m, 'new source file was added');
 unlike($outstr, qr/fileOld\.cpp/, 'old source file was removed');
 unlike($outstr, qr/file3\.h/, 'old header was removed');
 like($outstr, qr/fileNew\.h/, 'new header was added');
+like($outstr, qr/resource\.rc/, 'resource file was preserved');
+like($outstr, qr/file\.other/, 'other file was preserved');
 
 done_testing()
 
@@ -49,6 +51,9 @@ __DATA__
 			<File
 				RelativePath="file3.cpp">
 			</File>
+			<File
+				RelativePath="resource.rc">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -64,6 +69,14 @@ __DATA__
 			<File
 				RelativePath="file3.h"
 				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Some Other Files"
+			UniqueIdentifier="{zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz}">
+            <File
+                RelativePath="file.other"
+                >
 			</File>
 		</Filter>
 	</Files>
