@@ -103,4 +103,3 @@ foo$(EXE): \
     bar.$(OBJ) \
     baz.$(OBJ) \
     foo.$(OBJ)
-

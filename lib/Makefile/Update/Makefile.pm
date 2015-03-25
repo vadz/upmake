@@ -98,10 +98,21 @@ sub update_makefile
     # may or not have backslash after it.
     my ($indent, $tail, $last_tail);
 
+    # We can't use the usual check for EOF inside while itself because this
+    # wouldn't work for files with no new line after the last line, so check
+    # for the EOF manually.
+    my $eof = 0;
+
     # Set to 1 if we made any changes.
     my $changed = 0;
-    while (defined(my $line = <$in>)) {
-        chomp $line;
+    while (1) {
+        my $line = <$in>;
+        if (defined $line) {
+            chomp $line;
+        } else {
+            $line = '';
+            $eof = 1;
+        }
 
         # If we're inside the variable definition, parse the current line as
         # another file name,
@@ -313,7 +324,12 @@ sub update_makefile
             }
         }
 
-        print $out "$line\n";
+        print $out "$line";
+
+        # Don't add an extra new line at the EOF if it hadn't been there.
+        last if $eof;
+
+        print $out "\n";
     }
 
     $changed

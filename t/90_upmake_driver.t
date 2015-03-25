@@ -30,7 +30,6 @@ print $tmp <<'EOF';
 foo_sources = \
     a.cpp \
     h.cpp
-
 EOF
 
 my $fn = $tmp->filename;
