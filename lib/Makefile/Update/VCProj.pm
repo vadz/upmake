@@ -57,7 +57,10 @@ sub update_vcproj
     # headers).
     my %files_by_filter;
     foreach my $file (@$sources, @$headers) {
-        push @{$files_by_filter{$filter_cb->($file)}}, $file
+        my $filter = $filter_cb->($file);
+        if (defined $filter) {
+            push @{$files_by_filter{$filter}}, $file
+        }
     }
 
     # Name of the current filter, if any.
