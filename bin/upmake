@@ -46,6 +46,11 @@ use autodie;
 
 use Getopt::Long;
 
+# Allow running this script even without installing it.
+use File::Spec::Functions qw(catdir updir);
+use FindBin qw($Bin);
+use lib catdir($Bin, updir, 'lib');
+
 use Makefile::Update;
 use Makefile::Update::Bakefile0;
 use Makefile::Update::Makefile;
