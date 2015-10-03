@@ -11,8 +11,8 @@ once.
 Installation
 ------------
 
-Upmake is a Perl module with no non-core dependencies and can be installed in
-the usual way:
+Upmake is a Perl module with no non-core dependencies and can be installed by
+running the following commands:
 
 	perl Makefile.PL
 	make install
@@ -23,6 +23,7 @@ Alternatively, you can [download a single file](http://www.tt-solutions.com/down
 containing the latest version of the command line script with all its
 dependencies, but this won't allow you to use its functionality
 programmatically which is usually required for non-trivial projects.
+Notice that you still need to have Perl (5.10+) to run this file.
 
 
 Usage
