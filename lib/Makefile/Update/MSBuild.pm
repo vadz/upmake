@@ -28,8 +28,9 @@ Makefile::Update, Makefile::Update::VCProj
 
 Update sources and headers in an MSBuild project and filter files.
 
-Pass the path of the project to update as parameter and the references to the
-sources and headers arrays.
+Pass the path of the project to update or a hash with the same keys as used by
+C<Makefile::Update::upmake> as the first parameter and the references to the
+sources and headers arrays as the subsequent ones.
 
 Returns 1 if any changes were made, either to the project itself or to its
 associated C<.filters> file.
@@ -37,17 +38,26 @@ associated C<.filters> file.
 
 sub update_msbuild_project
 {
-    my ($project_fname, $sources, $headers) = @_;
+    my ($file_or_options, $sources, $headers) = @_;
 
     use Makefile::Update;
 
-    if (!Makefile::Update::upmake($project_fname,
+    if (!Makefile::Update::upmake($file_or_options,
                 \&update_msbuild, $sources, $headers
             )) {
         return 0;
     }
 
-    return Makefile::Update::upmake("$project_fname.filters",
+    my $args;
+    if (ref $file_or_options eq 'HASH') {
+        # Need to make a copy to avoid modifying the callers hash.
+        $args = { %$file_or_options };
+        $args->{file} .= ".filters"
+    } else {
+        $args = "$file_or_options.filters"
+    }
+
+    return Makefile::Update::upmake($args,
                 \&update_msbuild_filters, $sources, $headers
             );
 }
