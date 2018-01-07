@@ -58,6 +58,8 @@ sub update_bakefile_0
             s/<!-- .* -->//;
             s/^\s+//;
             s/\s+$//;
+            s{<if [^>]+>}{};
+            s{</if>}{};
             if (m{</set>}) {
                 # Check if we have any new files.
                 #
